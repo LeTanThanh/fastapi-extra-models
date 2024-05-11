@@ -3,7 +3,6 @@ from fastapi import Body
 from fastapi import Path
 
 from typing import Annotated
-from typing import Union
 
 from models.user import UserParam
 from models.user import UserResponse
@@ -11,6 +10,7 @@ from models.user import UserDb
 
 from models.item import CarItem
 from models.item import PlaneItem
+from models.item import Item
 
 from utils.password import hash_password
 from crud.user import save_user
@@ -24,18 +24,26 @@ async def create_user(user: Annotated[UserParam, Body(embed = True)]) -> UserRes
   return UserResponse(**user_db.model_dump())
 
 # Union or anyOf
-items = {
-  "car": {
-    "description": "All my friends drive a low rider",
-    "type": "car"
-  },
-  "plane": {
-    "description": "Music is my aeroplane, it's my aeroplane",
-    "type": "plane",
-    "size": 5
-  }
-}
-
-@app.get("/items/{id}", response_model = Union[PlaneItem, CarItem])
+@app.get("/items/{id}", response_model = PlaneItem | CarItem)
 async def read_items(id: Annotated[str, Path()]) -> PlaneItem | CarItem:
+  items = {
+    "car": {
+      "description": "All my friends drive a low rider",
+      "type": "car"
+    },
+    "plane": {
+      "description": "Music is my aeroplane, it's my aeroplane",
+      "type": "plane",
+      "size": 5
+    }
+  }
   return items[id]
+
+# List of models
+@app.get("/items", response_model=list[Item])
+async def read_items() -> list[Item]:
+  items = [
+    {"name": "Foo", "description": "There comes my hero"},
+    {"name": "Red", "description": "It's my aeroplane"},
+  ]
+  return items
