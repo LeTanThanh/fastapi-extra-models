@@ -47,3 +47,8 @@ async def read_items() -> list[Item]:
     {"name": "Red", "description": "It's my aeroplane"},
   ]
   return items
+
+# Response with arbitrary dict
+@app.get("/keyword_weights", response_model = dict[str, float])
+def read_keyword_weights() -> dict[str, float]:
+  return {"foo": 2.3, "bar": 3.4}
